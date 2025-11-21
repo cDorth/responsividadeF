@@ -1,6 +1,14 @@
 modules = ["web", "nodejs-20", "python-3.11"]
 [agent]
 expertMode = true
+integrations = ["python_database:1.0.0"]
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+SECRET_KEY = "XawPTvaLvAKIDf6Vt50EzPHpc1G0kiQv_WnYJnDDRbHxZQ_kXlYQkAWWWXu1W_N4UxM"
+FERNET_KEY = "HtrIRbtkR9e3q95GchCapydNChUit9gkT53fADctFbs="
+DEBUG = "True"
