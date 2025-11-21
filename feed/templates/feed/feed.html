@@ -445,30 +445,33 @@
     </div>
 
     <!-- Bottom Navigation for Mobile -->
-    <nav class="bottom-nav">
+    <nav class="bottom-nav" role="navigation" aria-label="Mobile navigation">
       <div class="bottom-nav-container">
-        <a href="{% url 'feed:feed' %}" class="bottom-nav-item active">
-          <span class="icon">📅</span>
+        <a href="{% url 'feed:feed' %}" class="bottom-nav-item active" aria-label="Feed" aria-current="page">
+          <span class="icon" aria-hidden="true">📅</span>
           <span>Feed</span>
         </a>
-        <a href="{% url 'home' %}" class="bottom-nav-item">
-          <span class="icon">👤</span>
+        <a href="{% url 'home' %}" class="bottom-nav-item" aria-label="Perfil">
+          <span class="icon" aria-hidden="true">👤</span>
           <span>Perfil</span>
         </a>
-        <a href="{% url 'game_home' %}" class="bottom-nav-item">
-          <span class="icon">🏅</span>
-          <span>Gamificação</span>
+        <a href="{% url 'game_home' %}" class="bottom-nav-item" aria-label="Gamificação">
+          <span class="icon" aria-hidden="true">🏅</span>
+          <span>Gamif.</span>
         </a>
-        <a href="#conquistas" class="bottom-nav-item">
-          <span class="icon">🏆</span>
-          <span>Conquistas</span>
-        </a>
-        <a href="{% url 'listar_eventos_compacto' %}" class="bottom-nav-item">
-          <span class="icon">🗓️</span>
+        <button 
+          class="bottom-nav-item bottom-nav-create" 
+          onclick="document.querySelector('.create-post-form textarea').focus(); window.scrollTo({top: 0, behavior: 'smooth'});"
+          aria-label="Criar novo post"
+          title="Criar novo post">
+          <span class="icon-create" aria-hidden="true">+</span>
+        </button>
+        <a href="{% url 'listar_eventos_compacto' %}" class="bottom-nav-item" aria-label="Eventos">
+          <span class="icon" aria-hidden="true">🗓️</span>
           <span>Eventos</span>
         </a>
-        <a href="{% url 'chat' %}" class="bottom-nav-item">
-          <span class="icon">💬</span>
+        <a href="{% url 'chat' %}" class="bottom-nav-item" aria-label="Chat">
+          <span class="icon" aria-hidden="true">💬</span>
           <span>Chat</span>
         </a>
       </div>
