@@ -412,15 +412,25 @@
                 </div>
 
 <div class="eventos-container">
+  <div class="section-header">
+    <h3>Eventos</h3>
+  </div>
+  
   {% for evento in eventos %}
-    <div class="evento-topo">
-      Evento
-    </div>  
     <div class="evento-card">
       {% if evento.foto %}
         <img src="{{ evento.foto.url }}" alt="{{ evento.titulo }}" class="evento-foto">
       {% else %}
-        <img src="{% static 'img/default-event.png' %}" alt="Evento" class="evento-foto">
+        <div class="evento-foto evento-placeholder" style="background: linear-gradient(135deg, 
+          hsl({{ evento.id|add:100|divisibleby:360 }}, 70%, 60%), 
+          hsl({{ evento.id|add:200|divisibleby:360 }}, 70%, 50%));">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
       {% endif %}
       
       <div class="evento-info">
@@ -433,9 +443,11 @@
     <p class="sem-eventos">Nenhum evento encontrado.</p>
   {% endfor %}
 
+  {% if eventos %}
   <div class="ver-todos-container">
-    <a href="{% url 'listar_eventos_compacto' %}" class="btn-ver-todos">Ver todos os eventos →</a>
+    <a href="{% url 'listar_eventos' %}" class="btn-ver-todos">Ver todos os eventos →</a>
   </div>
+  {% endif %}
 </div>
 
 
