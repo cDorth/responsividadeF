@@ -448,23 +448,28 @@
     <nav class="bottom-nav">
       <div class="bottom-nav-container">
         <a href="{% url 'feed:feed' %}" class="bottom-nav-item active">
-          <span class="icon">📊</span>
-          <span>Dashboard</span>
-        </a>
-        <a href="{% url 'feed:feed' %}" class="bottom-nav-item">
-          <span class="icon">📰</span>
+          <span class="icon">📅</span>
           <span>Feed</span>
-        </a>
-        <a href="{% url 'feed:create_post' %}" class="bottom-nav-item">
-          <span class="icon">➕</span>
-        </a>
-        <a href="{% url 'chat' %}" class="bottom-nav-item">
-          <span class="icon">📝</span>
-          <span>Chat</span>
         </a>
         <a href="{% url 'home' %}" class="bottom-nav-item">
           <span class="icon">👤</span>
           <span>Perfil</span>
+        </a>
+        <a href="{% url 'game_home' %}" class="bottom-nav-item">
+          <span class="icon">🏅</span>
+          <span>Gamificação</span>
+        </a>
+        <a href="#conquistas" class="bottom-nav-item">
+          <span class="icon">🏆</span>
+          <span>Conquistas</span>
+        </a>
+        <a href="{% url 'listar_eventos_compacto' %}" class="bottom-nav-item">
+          <span class="icon">🗓️</span>
+          <span>Eventos</span>
+        </a>
+        <a href="{% url 'chat' %}" class="bottom-nav-item">
+          <span class="icon">💬</span>
+          <span>Chat</span>
         </a>
       </div>
     </nav>

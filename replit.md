@@ -24,13 +24,15 @@ The application is fully configured and running on Replit with:
 - Added comprehensive CSS media queries for mobile devices
 - Hid sidebar panels (left and right) on screens < 1024px
 - Created bottom navigation menu for mobile with icons for:
-  - Dashboard
   - Feed
-  - Create Post (center button)
-  - Chat
   - Profile
+  - Gamificação
+  - Conquistas
+  - Eventos
+  - Chat
 - Maintained all existing functionality while improving mobile UX
 - Responsive breakpoints at 1024px (tablet), 640px (phone), and 380px (small phone)
+- All sidebar menu items accessible through bottom navigation on mobile
 
 ### Database
 - Using SQLite for development (db.sqlite3)
