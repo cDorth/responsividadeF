@@ -1,96 +1,306 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="pt-br">
-  <head>
+<html lang="pt-BR">
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Eventos</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body class="bg-light">
-    <div class="container mt-5">
-      <h2 class="mb-4 text-center">Eventos</h2>
+    <title>MySphere - Eventos</title>
+    <link rel="stylesheet" href="{% static 'eventos/css/eventos.css' %}" />
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <h1>{{user.tenant.nome}}</h1>
+                </div>
+                <form action="{% url 'feed:search' %}" method="GET" class="search-bar">
+                    <input type="text" name="q" placeholder="Buscar" autocomplete="off" />
+                </form>
+            </div>
+            <div class="header-right">
+                {% if user.is_staff %}
+                    <a href="{% url 'home_staff' %}" class="btn-staff">Staff</a>
+                {% endif %}
+                <div class="user-info">
+                    {% if user.foto %}
+                    <img src="{{ user.foto.url }}" alt="{{ user.username }}" class="user-avatar-small" />
+                    {% else %}
+                    <div class="user-avatar-small default-avatar">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                    {% endif %}
+                    <a href="{% url 'home' %}" style="text-decoration: none;"><span>{{ user.username }}</span></a>
+                </div>
+            </div>
+        </header>
 
-      {% if pode_gerenciar %}
-      <div class="text-end mb-3">
-        <a href="{% url 'criar_evento' %}" class="btn btn-primary"
-          >+ Criar novo evento</a
-        >
-      </div>
-      {% endif %}
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Sidebar - Navigation -->
+            <aside class="sidebar-left">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        {% if user.foto %}
+                        <img src="{{ user.foto.url }}" alt="{{ user.username }}" class="profile-avatar" />
+                        {% else %}
+                        <div class="profile-avatar default-avatar-large">
+                            {{ user.username|slice:":1"|upper }}
+                        </div>
+                        {% endif %}
+                        <h3>{{ user.get_full_name|default:user.username }}</h3>
+                        <p class="profile-username">@{{ user.username }}</p>
+                    </div>
+                </div>
 
-      <table class="table table-bordered table-striped align-middle">
-        <thead class="table-dark text-center">
-          <tr>
-            <th>imagem</th>
-            <th>Título</th>
-            <th>Descrição</th>
-            <th>Início</th>
-            <th>Fim</th>
-            <th>Criado por</th>
-            <th>Tenant</th>
-            {% if pode_gerenciar %}
-            <th>ações</th>
-            {% endif %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for evento in eventos %}
-          <tr>
-            {% if evento.foto %}
-            <td>
-              <img src="{{ evento.foto.url }}" class="event-photo" />
-              {% comment %} {% else %}
-              <div class="profile-avatar default-avatar-large">
-                {{ profile_user.username|slice:":1"|upper }}
-              </div>
-              {% endif %} {% endcomment %}
-            </td>
-            {% else %}
-            <td>não tem imagem</td>
-            {% endif %}
-            <td class="fw-semibold">{{ evento.titulo }}</td>
-            <td>{{ evento.descricao|default:"(sem descrição)" }}</td>
-            <td>{{ evento.inicio|date:"d/m/Y H:i" }}</td>
-            <td>{{ evento.fim|date:"d/m/Y H:i" }}</td>
-            <td>{{ evento.criado_por.username }}</td>
-            <td>{{ evento.tenant }}</td>
-            {% if pode_gerenciar %}
-            <td class="text-center">
-              <a
-                href="{% url 'editar_evento' evento.id %}"
-                class="btn btn-warning btn-sm"
-                >Editar</a
-              >
+                <nav class="sidebar-menu">
+                    <a href="{% url 'feed:feed' %}" class="menu-item">
+                        <span class="icon">📅</span> Feed
+                    </a>
+                    <a href="{% url 'home' %}" class="menu-item">
+                        <span class="icon">👤</span> Perfil
+                    </a>
+                    <a href="{% url 'game_home' %}" class="menu-item">
+                        <span class="icon">🏅</span> Gamificação
+                    </a>
+                    <a href="{% url 'listar_eventos' %}" class="menu-item active">
+                        <span class="icon">🗓️</span> Eventos
+                    </a>
+                    <a href="{% url 'chat' %}" class="menu-item">
+                        <span class="icon">💬</span> Chat
+                    </a>
+                </nav>
+            </aside>
 
-              <form
-                action="{% url 'excluir_evento' evento.id %}"
-                method="post"
-                style="display: inline"
-              >
-                {% csrf_token %}
-                <button
-                  type="submit"
-                  class="btn btn-danger"
-                  onclick="return confirm('Tem certeza que deseja excluir este evento?');"
-                >
-                  Excluir
-                </button>
-              </form>
-            </td>
-            {% endif %}
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="7" class="text-center text-muted py-3">
-              Nenhum evento encontrado.
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+            <!-- Center Content - Events -->
+            <main class="center-content">
+                <div class="events-header">
+                    <div class="events-title">
+                        <h2>Eventos</h2>
+                        <p class="subtitle">Descubra e participe dos próximos eventos</p>
+                    </div>
+                    {% if pode_gerenciar %}
+                    <a href="{% url 'criar_evento' %}" class="btn-create-event">
+                        <span class="plus-icon">+</span> Criar Evento
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Events Grid -->
+                <div class="events-grid">
+                    {% for evento in eventos %}
+                    <div class="event-card" onclick="openEventModal({{ evento.id }})">
+                        <div class="event-image">
+                            {% if evento.foto %}
+                            <img src="{{ evento.foto.url }}" alt="{{ evento.titulo }}" />
+                            {% else %}
+                            <div class="event-placeholder">
+                                <span class="calendar-icon">📅</span>
+                            </div>
+                            {% endif %}
+                            <div class="event-date-badge">
+                                <div class="badge-day">{{ evento.inicio|date:"d" }}</div>
+                                <div class="badge-month">{{ evento.inicio|date:"M" }}</div>
+                            </div>
+                        </div>
+                        <div class="event-content">
+                            <h3 class="event-title">{{ evento.titulo }}</h3>
+                            <div class="event-info-row">
+                                <span class="event-time">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    {{ evento.inicio|date:"H:i" }}
+                                </span>
+                                <span class="event-duration">
+                                    {{ evento.inicio|date:"d/m/Y" }}
+                                </span>
+                            </div>
+                            <p class="event-description">{{ evento.descricao|truncatewords:15|default:"Sem descrição disponível" }}</p>
+                            <div class="event-footer">
+                                <div class="event-creator">
+                                    {% if evento.criado_por.foto %}
+                                    <img src="{{ evento.criado_por.foto.url }}" alt="{{ evento.criado_por.username }}" class="creator-avatar" />
+                                    {% else %}
+                                    <div class="creator-avatar default-creator-avatar">
+                                        {{ evento.criado_por.username|slice:":1"|upper }}
+                                    </div>
+                                    {% endif %}
+                                    <span>{{ evento.criado_por.get_full_name|default:evento.criado_por.username }}</span>
+                                </div>
+                                {% if pode_gerenciar %}
+                                <div class="event-actions">
+                                    <a href="{% url 'editar_evento' evento.id %}" class="btn-icon btn-edit" onclick="event.stopPropagation()" title="Editar">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                    </a>
+                                    <form action="{% url 'excluir_evento' evento.id %}" method="post" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir este evento?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-icon btn-delete" onclick="event.stopPropagation()" title="Excluir">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-state">
+                        <div class="empty-icon">📅</div>
+                        <h3>Nenhum evento encontrado</h3>
+                        <p>Não há eventos cadastrados no momento.</p>
+                        {% if pode_gerenciar %}
+                        <a href="{% url 'criar_evento' %}" class="btn-create-event">Criar Primeiro Evento</a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </main>
+
+            <!-- Right Sidebar - Upcoming Events -->
+            <aside class="sidebar-right">
+                <div class="upcoming-section">
+                    <h3>Próximos Eventos</h3>
+                    {% for evento in eventos|slice:":3" %}
+                    <div class="upcoming-event" onclick="openEventModal({{ evento.id }})">
+                        <div class="upcoming-date">
+                            <div class="date-day">{{ evento.inicio|date:"d" }}</div>
+                            <div class="date-month">{{ evento.inicio|date:"M" }}</div>
+                        </div>
+                        <div class="upcoming-info">
+                            <h4>{{ evento.titulo|truncatewords:5 }}</h4>
+                            <p>{{ evento.inicio|date:"H:i" }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="no-upcoming">Nenhum evento próximo</p>
+                    {% endfor %}
+                </div>
+            </aside>
+        </div>
     </div>
-  </body>
+
+    <!-- Event Detail Modal -->
+    <div id="eventModal" class="modal">
+        <div class="modal-overlay" onclick="closeEventModal()"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeEventModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div id="modalBody">
+                <!-- Content will be dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const eventsData = {
+            {% for evento in eventos %}
+            {{ evento.id }}: {
+                id: {{ evento.id }},
+                titulo: "{{ evento.titulo|escapejs }}",
+                descricao: "{{ evento.descricao|escapejs }}",
+                inicio: "{{ evento.inicio|date:'d/m/Y H:i' }}",
+                fim: "{{ evento.fim|date:'d/m/Y H:i' }}",
+                {% if evento.foto %}foto: "{{ evento.foto.url }}",{% endif %}
+                criador: "{{ evento.criado_por.get_full_name|default:evento.criado_por.username|escapejs }}",
+                tenant: "{{ evento.tenant.nome|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        };
+
+        function openEventModal(eventId) {
+            const event = eventsData[eventId];
+            const modal = document.getElementById('eventModal');
+            const modalBody = document.getElementById('modalBody');
+            
+            let content = `
+                <div class="modal-header">
+                    ${event.foto ? `<img src="${event.foto}" alt="${event.titulo}" class="modal-image" />` : ''}
+                    <h2>${event.titulo}</h2>
+                </div>
+                <div class="modal-details">
+                    <div class="detail-row">
+                        <div class="detail-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Início
+                        </div>
+                        <div class="detail-value">${event.inicio}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Término
+                        </div>
+                        <div class="detail-value">${event.fim}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Criado por
+                        </div>
+                        <div class="detail-value">${event.criador}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Organização
+                        </div>
+                        <div class="detail-value">${event.tenant}</div>
+                    </div>
+                    ${event.descricao ? `
+                    <div class="detail-description">
+                        <h3>Descrição</h3>
+                        <p>${event.descricao}</p>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            modalBody.innerHTML = content;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEventModal() {
+            const modal = document.getElementById('eventModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeEventModal();
+            }
+        });
+    </script>
+</body>
 </html>
