@@ -17,12 +17,31 @@ body {
     margin: 0 auto;
 }
 
+/* Sidebar Menu Customization for Events */
+.sidebar-menu .menu-item.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.sidebar-menu .menu-item.active .icon {
+    filter: brightness(1.2);
+}
+
+/* Events Container Wrapper */
+.feed-center {
+    max-width: 100%;
+}
+
 /* Events Header */
 .events-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .events-title h2 {
@@ -476,6 +495,15 @@ body {
 
 /* Responsive Design */
 @media (max-width: 1200px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-left,
+    .sidebar-right {
+        display: none;
+    }
+
     .events-grid {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
