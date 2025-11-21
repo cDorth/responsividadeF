@@ -17,15 +17,7 @@ body {
     margin: 0 auto;
 }
 
-/* Sidebar Menu Customization for Events */
-.sidebar-menu .menu-item.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.sidebar-menu .menu-item.active .icon {
-    filter: brightness(1.2);
-}
+/* Sidebar Menu Customization for Events - Removed to use default styling */
 
 /* Events Container Wrapper */
 .feed-center {
