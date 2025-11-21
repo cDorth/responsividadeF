@@ -1,0 +1,371 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Lista de Chats{% endblock %}</title>
+    {% block css %}{% endblock %} 
+    <link rel="stylesheet" href="{% static 'chat/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'chat/css/chat_detail.css' %}">
+    <script src="{% static 'chat/js/script.js' %}"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <a href="{% url 'feed:feed' %}"><h1>{{user.tenant.nome}}</h1></a>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                {% if user.foto %}
+                    <img src="{{ user.foto.url }}" alt="{{ user.username }}" class="user-avatar-small">
+                {% else %}
+                    <div class="user-avatar-small default-avatar">{{ user.username|first|upper }}</div>
+                {% endif %}
+                <span>{{ user.username }}</span>
+            </div>
+        </div>
+    </header>
+
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="containers">
+        <div class="container-1">
+            <div class="chat-menu">
+                <h1>Chat</h1>
+                <input type="text" placeholder="Pesquisar..." class="chat-barra" id="chatSearch">
+                
+                <a class="add-btn">+ Novo Chat</a>
+                <div class="overlay" id="overlay"></div>
+
+                <div class="new-chat-box" id="newChatBox">
+                    <h3>Novo Chat</h3>
+                    <form id="chatForm" method="POST" action="{% url 'criar_chat_ajax' %}">
+                        {% csrf_token %}
+                        <input type="email" name="email" placeholder="E-mail do usuário" required>
+                        <button type="submit">Criar</button>
+                    </form>
+                    <p id="formMessage"></p>
+                    <button class="close-btn" id="closeBtn">&times;</button>
+                </div>
+                
+                <hr>
+            </div>
+            <div class="chat-list">
+                {% if chats %}
+                    {% for chat in chats %}
+                        <a class="clique" href="{% url 'chat_detail' chat.id %}">
+                            <div class="chat-block">
+                                {% if chat.user1 == request.user %}
+                                    {% if chat.user2.foto %}
+                                        <img src="{{ chat.user2.foto.url }}" alt="{{ chat.user2.username }}">
+                                    {% else %}
+                                        <div class="default-avatar">{{ chat.user2.username|first|upper }}</div>
+                                    {% endif %}
+                                {% else %}
+                                    {% if chat.user1.foto %}
+                                        <img src="{{ chat.user1.foto.url }}" alt="{{ chat.user1.username }}">
+                                    {% else %}
+                                        <div class="default-avatar">{{ chat.user1.username|first|upper }}</div>
+                                    {% endif %}
+                                {% endif %}
+
+                                <div class="chat-info">
+                                    <div class="chat-info-header">
+                                        {% if chat.user1 == request.user %}
+                                            <strong>{{ chat.user2.username }}</strong>
+                                        {% else %}
+                                            <strong>{{ chat.user1.username }}</strong>
+                                        {% endif %}
+                                        {% if chat.messages.last %}
+                                            <span class="chat-time">{{ chat.messages.last.criado_em|date:"H:i" }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if chat.messages.last %}
+                                        <span class="chat-preview">{{ chat.messages.last.conteudo|truncatechars:30 }}</span>
+                                    {% else %}
+                                        <span class="chat-preview">Sem mensagens</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-chats">
+                        <p>Você não tem chats ainda.</p>
+                        <p style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">
+                            Clique em "Novo Chat" para começar!
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="container-2">
+            {% block content %}
+                <div class="no-chat-selected">
+                    <div class="no-chat-icon">💬</div>
+                    <h2>Selecione um chat</h2>
+                    <p>Escolha uma conversa na lista ao lado ou inicie um novo chat</p>
+                </div>
+            {% endblock content %}
+        </div>
+    </div>
+<script>
+    // URLs
+    const criarChatUrl = "{% url 'criar_chat_ajax' %}";
+    const atualizarChatsUrl = "{% url 'atualizar_chats' %}";
+    // Cria uma URL base para 'chat_detail' removendo o '0/'
+    const chatDetailBaseUrl = "{% url 'chat_detail' 0 %}".slice(0, -1); 
+
+    // --- FUNÇÃO DE ATUALIZAÇÃO E POLLING ---
+    function fetchAndRenderChats() {
+        fetch(atualizarChatsUrl)
+            .then(response => response.json())
+            .then(data => {
+                const chatListContainer = document.querySelector('.chat-list');
+                if (!chatListContainer) return;
+
+                let newHtml = '';
+                
+                // Tenta determinar o ID do chat atualmente aberto (se estiver em chat_detail)
+                const pathParts = window.location.pathname.split('/');
+                // Procura um ID no caminho que se pareça com /chat/123/
+                const currentChatId = pathParts.find((part, index) => 
+                    index > 0 && pathParts[index - 1] === 'chat' && !isNaN(parseInt(part))
+                );
+
+                if (data.chats && data.chats.length > 0) {
+                    data.chats.forEach(chat => {
+                        // Verifica se é o chat ativo para adicionar a classe de estilo
+                        const isCurrentChat = chat.id == currentChatId;
+                        const activeClass = isCurrentChat ? ' active-chat' : '';
+                        
+                        // 1. Determinar o avatar
+                        const avatarHtml = chat.foto_url 
+                            ? `<img src="${chat.foto_url}" alt="${chat.username}">`
+                            : `<div class="default-avatar">${chat.username.charAt(0).toUpperCase()}</div>`;
+                        
+                        // 2. Determinar a última mensagem
+                        const lastMessage = chat.last_message ? chat.last_message.substring(0, 30) + (chat.last_message.length > 30 ? '...' : '') : 'Sem mensagens';
+                        const lastMessageTime = chat.last_message_time || '';
+                        
+                        // 3. HTML para o bloco de chat (inclui o unread_count)
+                        newHtml += `
+                            <a class="clique${activeClass}" href="${chatDetailBaseUrl}${chat.id}/">
+                                <div class="chat-block">
+                                    ${avatarHtml}
+                                    <div class="chat-info">
+                                        <div class="chat-info-header">
+                                            <strong>${chat.username}</strong>
+                                            <span class="chat-time">${lastMessageTime}</span>
+                                        </div>
+                                        <span class="chat-preview">${lastMessage}</span>
+                                    </div>
+                                    ${chat.unread_count > 0 ? `<div class="unread-count">${chat.unread_count}</div>` : ''}
+                                </div>
+                            </a>
+                        `;
+                    });
+                } else {
+                    newHtml = `
+                        <div class="no-chats">
+                            <p>Você não tem chats ainda.</p>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">
+                                Clique em "Novo Chat" para começar!
+                            </p>
+                        </div>
+                    `;
+                }
+                
+                // Substitui o conteúdo da lista, garantindo a atualização instantânea
+                chatListContainer.innerHTML = newHtml;
+
+                // Re-inicializa a funcionalidade de pesquisa
+                initializeSearch();
+            })
+            .catch(error => {
+                console.error("Erro ao buscar chats:", error);
+            });
+    }
+
+    // Inicializa a funcionalidade de pesquisa, para ser chamada após a atualização da lista
+    function initializeSearch() {
+        const searchInput = document.getElementById('chatSearch');
+        
+        if (searchInput) {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            document.querySelectorAll('.clique').forEach(function(link) {
+                // Certifique-se de que o elemento existe antes de tentar acessar suas propriedades
+                const chatBlock = link.querySelector('.chat-block');
+                if (!chatBlock) return;
+                
+                const username = chatBlock.querySelector('strong').textContent.toLowerCase();
+                const preview = chatBlock.querySelector('.chat-preview').textContent.toLowerCase();
+                
+                if (username.includes(searchTerm) || preview.includes(searchTerm)) {
+                    link.style.display = 'block';
+                } else {
+                    link.style.display = 'none';
+                }
+            });
+        }
+    }
+
+    // ===============================================
+    // ▼▼▼ LÓGICA DE LAYOUT RESPONSIVO (MUDANÇA) ▼▼▼
+    // ===============================================
+    function updateLayout() {
+        const isMobile = window.innerWidth <= 768;
+        const container1 = document.querySelector('.container-1');
+        const container2 = document.querySelector('.container-2');
+        
+        if (!container1 || !container2) return;
+
+        // Verifica se a URL é de um chat detalhado (ex: /chat/123/)
+        const pathParts = window.location.pathname.split('/');
+        const isChatDetail = pathParts.some((part, index) => 
+            index > 0 && pathParts[index - 1] === 'chat' && !isNaN(parseInt(part))
+        );
+
+        if (isMobile) {
+            if (isChatDetail) {
+                // Em mobile, na tela de chat: ESCONDE a lista, MOSTRA o chat
+                container1.style.display = 'none';
+                container2.style.display = 'flex'; // .container-2 é um flex-column
+            } else {
+                // Em mobile, na lista: MOSTRA a lista, ESCONDE o container de chat
+                container1.style.display = 'flex'; // .container-1 é um flex-column
+                container2.style.display = 'none';
+            }
+        } else {
+            // Em desktop: MOSTRA ambos
+            container1.style.display = 'flex';
+            container2.style.display = 'flex';
+        }
+    }
+    // ===============================================
+    // ▲▲▲ FIM DA LÓGICA DE LAYOUT ▲▲▲
+    // ===============================================
+
+
+    // --- Lógica de Criação de Chat (Melhoria) ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('chatSearch');
+        const addBtn = document.querySelector('.add-btn');
+        const overlay = document.getElementById('overlay');
+        const newChatBox = document.getElementById('newChatBox');
+        const closeBtn = document.getElementById('closeBtn');
+        const chatForm = document.getElementById('chatForm');
+        const formMessage = document.getElementById('formMessage');
+
+        // Funcionalidade do modal (open/close)
+        if (addBtn) {
+            addBtn.addEventListener('click', function() {
+                newChatBox.style.display = 'block';
+                overlay.style.display = 'block';
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                newChatBox.style.display = 'none';
+                overlay.style.display = 'none';
+                formMessage.textContent = ''; 
+                chatForm.reset();
+            });
+        }
+        
+        // Intercepta o envio do formulário de novo chat
+        if (chatForm) {
+            chatForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                formMessage.textContent = "Criando chat...";
+                formMessage.style.color = "#3498db"; 
+                
+                fetch(criarChatUrl, {
+                    method: 'POST',
+                    body: new FormData(chatForm),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                })
+                .then(response => {
+                    // Trata respostas HTTP não-2xx
+                    if (!response.ok) {
+                        return response.json().then(errorData => Promise.reject(errorData));
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'ok' && data.redirect_url) {
+                        // Sucesso: Redireciona para o chat recém-criado, garantindo a atualização da página inteira.
+                        window.location.href = data.redirect_url; 
+                    } 
+                })
+                .catch(errorData => {
+                    console.error('Erro ao criar chat:', errorData);
+                    const errorMessage = errorData.error || "Ocorreu um erro desconhecido ao tentar criar o chat.";
+                    formMessage.textContent = `Erro: ${errorMessage}`;
+                    formMessage.style.color = "red";
+                });
+            });
+        }
+        
+        // Funcionalidade de pesquisa de chats (inicia o listener)
+        if (searchInput) {
+            searchInput.addEventListener('input', initializeSearch);
+        }
+
+        // Auto-hide mensagens após 5 segundos
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                alert.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(function() {
+                    alert.remove();
+                }, 300);
+            }, 5000);
+        });
+
+        // 🟢 INICIA O POLLING PARA ATUALIZAÇÃO AUTOMÁTICA
+        // Chamada inicial para carregar/atualizar a lista
+        fetchAndRenderChats();
+        
+        // Define o intervalo de polling (a cada 5 segundos)
+        setInterval(fetchAndRenderChats, 1000); 
+
+        // 🟢 CHAMA A LÓGICA DE LAYOUT RESPONSIVO
+        updateLayout();
+        window.addEventListener('resize', updateLayout);
+    });
+
+    // Animação de saída (mantenha o CSS para os alerts)
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+</body>
+</html>

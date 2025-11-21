@@ -1,0 +1,449 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MySphere - Feed</title>
+    <link rel="stylesheet" href="{% static 'feed/css/style.css' %}" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-left">
+          <div class="logo">
+            <h1>{{user.tenant.nome}}</h1>
+          </div>
+          <form
+            action="{% url 'feed:search' %}"
+            method="GET"
+            class="search-bar"
+          >
+            <input
+              type="text"
+              name="q"
+              placeholder="Search"
+              autocomplete="off"
+            />
+          </form>
+        </div>
+        <div class="header-right">
+          {% if user.is_staff %}
+            <a href="{% url 'home_staff' %}" class="btn-staff">Staff</a>
+          {% endif %}
+          <div class="user-info">
+            {% if user.foto %}
+            <img
+              src="{{ user.foto.url }}"
+              alt="{{ user.username }}"
+              class="user-avatar-small"
+            />
+            {% else %}
+            <div class="user-avatar-small default-avatar">
+              {{ user.username|slice:":1"|upper }}
+            </div>
+            {% endif %}
+            <a href="{% url 'home' %}" style="text-decoration: none;"><span>{{ user.username }}</span></a>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Left Sidebar - Profile -->
+        <aside class="sidebar-left">
+          <div class="profile-card">
+            <div class="profile-header">
+              {% if user.foto %}
+              <img
+                src="{{ user.foto.url }}"
+                alt="{{ user.username }}"
+                class="profile-avatar"
+              />
+              {% else %}
+              <div class="profile-avatar default-avatar-large">
+                {{ user.username|slice:":1"|upper }}
+              </div>
+              {% endif %}
+              <h3>{{ user.get_full_name|default:user.username }}</h3>
+              <p class="profile-username">@{{ user.username }}</p>
+            </div>
+            <div class="profile-stats">
+              <div class="stat">
+                <span class="stat-number">{{ user.posts_authored.count }}</span>
+                <span class="stat-label">Post</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">235</span>
+                <span class="stat-label">Following</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">2.3k</span>
+                <span class="stat-label">Follower</span>
+              </div>
+            </div>
+          </div>
+
+                <nav class="sidebar-menu">
+                    <a href="{% url 'feed:feed' %}" class="menu-item active">
+                        <span class="icon">📅</span> Feed
+                    </a>
+                    <a href="{% url 'home' %}" class="menu-item">
+                        <span class="icon">👤</span> Perfil
+                    </a>
+                    <a href="{% url 'game_home' %}" class="menu-item">
+                        <span class="icon">🏅</span> Gamificação
+                    </a>
+                    <a href="#" class="menu-item">
+                        <span class="icon">🏆</span> Conquistas
+                    </a>
+                    <a href="{% url 'listar_eventos_compacto' %}" class="menu-item" >
+                        <span class="icon" >🗓️</span> Eventos
+                    </a>
+                    <a href="{% url 'chat' %}" class="menu-item">
+                        <span class="icon">💬</span> Chat
+                    </a>
+                </nav>
+
+          <div class="pages-section">
+            <h4>PAGES YOU LIKE</h4>
+            <div class="page-item">
+              <div class="page-icon">UI</div>
+              <span>UI/UX Community</span>
+            </div>
+            <div class="page-item">
+              <div class="page-icon">WD</div>
+              <span>Web Designer</span>
+            </div>
+            <div class="page-item">
+              <div class="page-icon">DR</div>
+              <span>Dribbble Community</span>
+            </div>
+            <div class="page-item">
+              <div class="page-icon">BE</div>
+              <span>Behance</span>
+            </div>
+            <a href="#" class="view-all">View All</a>
+          </div>
+        </aside>
+
+        <!-- Center - Feed -->
+        <main class="feed-center">
+          <!-- Create Post -->
+          <div class="create-post-card">
+            <form
+              method="POST"
+              action="{% url 'feed:create_post' %}"
+              enctype="multipart/form-data"
+              class="create-post-form"
+            >
+              {% csrf_token %}
+              <div class="post-input-area">
+                {% if user.foto %}
+                <img
+                  src="{{ user.foto.url }}"
+                  alt="{{ user.username }}"
+                  class="user-avatar-small"
+                />
+                {% else %}
+                <div class="user-avatar-small default-avatar">
+                  {{ user.username|slice:":1"|upper }}
+                </div>
+                {% endif %}
+                <textarea
+                  name="conteudo"
+                  placeholder="What's on your mind?"
+                  rows="2"
+                ></textarea>
+              </div>
+              <div
+                id="media-preview"
+                class="media-preview"
+                style="display: none"
+              ></div>
+              <div class="post-actions">
+                <div class="post-options">
+                  <label for="imagem-upload" class="post-option">
+                    <span class="icon">📷</span> Image/Video
+                    <input
+                      type="file"
+                      id="imagem-upload"
+                      name="imagem"
+                      accept="image/*,video/*"
+                      style="display: none"
+                    />
+                  </label>
+                  <label for="arquivo-upload" class="post-option">
+                    <span class="icon">📎</span> Attachment
+                    <input
+                      type="file"
+                      id="arquivo-upload"
+                      name="arquivo"
+                      style="display: none"
+                    />
+                  </label>
+                  <span class="post-option"
+                    ><span class="icon">#</span> Hashtag</span
+                  >
+                  <span class="post-option"
+                    ><span class="icon">@</span> Mention</span
+                  >
+                </div>
+                <button type="submit" class="btn-post">Share Post</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Posts Feed -->
+          {% for post in posts %}
+          <article class="post-card" data-post-id="{{ post.post_id }}">
+            <div class="post-header">
+              <div class="post-author">
+                {% if post.user.foto %}
+                <img
+                  src="{{ post.user.foto.url }}"
+                  alt="{{ post.user.username }}"
+                  class="user-avatar-small"
+                />
+
+
+
+                {% else %}
+                <div class="user-avatar-small default-avatar">
+                  {{ post.user.username|slice:":1"|upper }}
+                </div>
+                {% endif %}
+
+
+ {% comment %} ____________filtro de perfil_________________________________________________  {% endcomment %}
+               {%if post.user == request.user%}
+              
+                <div class="author-info">
+                  <a id="link_home" href="{% url 'home' %}"
+                    ><h4>
+                      {{ post.user.get_full_name|default:post.user.username }} 
+                    </h4>
+                  </a>
+                
+
+
+                {%else%}
+                <div class="author-info">
+                  <a id="link_perfil" href="{% url 'perfil' post.user.pk %}"
+                    ><h4>
+                      {{ post.user.get_full_name|default:post.user.username }} 
+                    </h4>
+                  </a>
+                  {% endif %}
+ {% comment %} ____________filtro de perfil_________________________________________________  {% endcomment %}
+                  <p class="post-time">
+                    {{ post.criado_em|date:"d M 'at' H:i" }}
+                  </p>
+                </div>
+              </div>
+              <button class="post-menu">⋮</button>
+            </div>
+
+            <div class="post-content">
+              <p>{{ post.conteudo_formatado|safe }}</p>
+            </div>
+
+            {% if post.imagem %}
+            <div class="post-media">
+              <img src="{{ post.imagem.url }}" alt="Post image" />
+            </div>
+            {% endif %} {% if post.video %}
+            <div class="post-media">
+              <video controls>
+                <source src="{{ post.video.url }}" type="video/mp4" />
+              </video>
+            </div>
+            {% endif %} {% if post.arquivo %}
+            <div class="post-file">
+              <a href="{{ post.arquivo.url }}" download class="file-link">
+                <span class="icon">📎</span> {{ post.arquivo.name|slice:"6:" }}
+              </a>
+            </div>
+            {% endif %}
+
+            <div class="post-stats">
+              <span class="post-likes"
+                >❤️
+                <span class="likes-count">{{ post.total_likes }}</span>
+                Like</span
+              >
+              <div class="post-interactions">
+                <span
+                  ><span class="comments-count">{{ post.total_comments }}</span>
+                  Comment</span
+                >
+                <span
+                  ><span class="shares-count">{{ post.total_shares }}</span>
+                  Share</span
+                >
+              </div>
+            </div>
+
+            <div class="post-actions-bar">
+              <button
+                class="action-btn like-btn {% if post.user_has_liked %}liked{% endif %}"
+                data-post-id="{{ post.post_id }}"
+              >
+                <span class="icon">❤️</span> Like
+              </button>
+              <button
+                class="action-btn comment-btn"
+                onclick="toggleCommentBox({{ post.post_id }})"
+              >
+                <span class="icon">💬</span> Comment
+              </button>
+              <button
+                class="action-btn share-btn"
+                data-post-id="{{ post.post_id }}"
+              >
+                <span class="icon">🔗</span> Share
+              </button>
+            </div>
+
+            <div
+              class="comments-section"
+              id="comments-{{ post.post_id }}"
+              style="display: none"
+            >
+              <div class="comments-list">
+                {% for comment in post.comments.all %}
+                <div class="comment">
+                  <div class="comment-author">
+                    {% if comment.user.foto %}
+                    <img
+                      src="{{ comment.user.foto.url }}"
+                      alt="{{ comment.user.username }}"
+                      class="user-avatar-tiny"
+                    />
+                    {% else %}
+                    <div class="user-avatar-tiny default-avatar">
+                      {{ comment.user.username|slice:":1"|upper }}
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="comment-content">
+                    <h5>{{ comment.user.username }}</h5>
+                    <p>{{ comment.conteudo }}</p>
+                    <span class="comment-time"
+                      >{{ comment.criado_em|date:"d/m/Y H:i" }}</span
+                    >
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+
+              <form class="comment-form" data-post-id="{{ post.post_id }}">
+                {% csrf_token %}
+                <input
+                  type="text"
+                  name="conteudo"
+                  placeholder="Write a comment..."
+                />
+                <button type="submit">Send</button>
+              </form>
+            </div>
+          </article>
+          {% empty %}
+          <div class="no-posts">
+            <p>Nenhum post ainda. Seja o primeiro a postar!</p>
+          </div>
+          {% endfor %}
+        </main>
+
+            <!-- Right Sidebar - Events/Messages -->
+            <aside class="sidebar-right">
+                <div class="messages-section">
+                    <div class="section-header">
+                        <h3>Mensagens</h3>
+                        
+                    </div>
+                    <div class="messages-list">
+                        {% if chats %}
+                            {% for chat in chats %}
+                                <a class="clique" href="{% url 'chat_detail' chat.id %}">
+                                    <div class="mensagem-item">
+                                        {% if chat.user1 == request.user %}
+                                            {% if chat.user2.foto %}
+                                                <img src="{{ chat.user2.foto.url }}" alt="{{ chat.user2.username }}">
+                                            {% else %}
+                                                <div class="default-avatar">{{ chat.user2.username|first|upper }}</div>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if chat.user1.foto %}
+                                                <img src="{{ chat.user1.foto.url }}" alt="{{ chat.user1.username }}">
+                                            {% else %}
+                                                <div class="default-avatar">{{ chat.user1.username|first|upper }}</div>
+                                            {% endif %}
+                                        {% endif %}
+
+                                        <div class="chat-info">
+                                            <div class="chat-info-header">
+                                                {% if chat.user1 == request.user %}
+                                                    <strong>{{ chat.user2.username }}</strong>
+                                                {% else %}
+                                                    <strong>{{ chat.user1.username }}</strong>
+                                                {% endif %}
+                                                {% if chat.messages.last %}
+                                                    <span class="chat-time">{{ chat.messages.last.criado_em|date:"H:i" }}</span>
+                                                {% endif %}
+                                            </div>
+                                            {% if chat.messages.last %}
+                                                <span class="chat-preview">{{ chat.messages.last.conteudo|truncatechars:30 }}</span>
+                                            {% else %}
+                                                <span class="chat-preview">Sem mensagens</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="no-chats">
+                                <p>Você não tem chats ainda.</p>
+                            </div>
+                        {% endif %}  
+                    </div>
+                    <a href="{% url 'chat' %}" class="view-all">Ver todas</a>
+                </div>
+
+<div class="eventos-container">
+  {% for evento in eventos %}
+    <div class="evento-topo">
+      Evento
+    </div>  
+    <div class="evento-card">
+      {% if evento.foto %}
+        <img src="{{ evento.foto.url }}" alt="{{ evento.titulo }}" class="evento-foto">
+      {% else %}
+        <img src="{% static 'img/default-event.png' %}" alt="Evento" class="evento-foto">
+      {% endif %}
+      
+      <div class="evento-info">
+        <h4 class="evento-titulo">{{ evento.titulo }}</h4>
+        <p class="evento-desc">{{ evento.descricao|default:"(sem descrição)"|truncatechars:30  }}</p>
+        <span class="evento-data">{{ evento.fim|date:"d/m H:i" }}</span>
+      </div>
+    </div>
+  {% empty %}
+    <p class="sem-eventos">Nenhum evento encontrado.</p>
+  {% endfor %}
+
+  <div class="ver-todos-container">
+    <a href="{% url 'listar_eventos_compacto' %}" class="btn-ver-todos">Ver todos os eventos →</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+    </div>
+
+    <script src="{% static 'feed/js/feed.js' %}"></script>
+  </body>
+</html>
