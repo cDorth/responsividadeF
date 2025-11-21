@@ -205,8 +205,9 @@ body {
 }
 
 .menu-item.active {
-  background: #e7f3ff;
-  color: #2563eb;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
 }
 
 .menu-item .icon {
