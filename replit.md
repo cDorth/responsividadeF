@@ -6,12 +6,41 @@ MySphere is a Django-based multi-tenant professional social network platform imp
 ## Current Status
 The application is fully configured and running on Replit with:
 - Django 5.2.6 on Python 3.11
-- SQLite database (development)
+- PostgreSQL database (Replit's built-in database)
 - Complete mobile responsive design
 - Bottom navigation menu for mobile devices
+- **NEW**: Professionally redesigned eventos (events) page
 - All core features functional
 
 ## Recent Changes (November 21, 2025)
+
+### PostgreSQL Database Migration
+- Successfully migrated from SQLite to PostgreSQL using Replit's built-in database
+- All 58 migrations applied successfully to PostgreSQL
+- Created test tenant "MySphere Corp" with test data
+- Test credentials: teste@mysphere.com / teste123
+- 5 sample events created for testing
+
+### Events Page Complete Redesign
+- **NEW**: Completely redesigned eventos page with professional, modern UI
+- Follows MySphere design system with gradient purple theme
+- Features:
+  - Beautiful card-based grid layout for events
+  - Event cards with images, date badges, and creator info
+  - Interactive modal popup for full event details
+  - Elegant animations and hover effects
+  - Sticky navigation and sidebars
+  - "Próximos Eventos" sidebar widget
+  - Empty state handling
+  - Edit/Delete buttons for staff users (inline on cards)
+- Full responsive design with breakpoints at:
+  - 1200px: Hides right sidebar
+  - 968px: Collapses to single column, hides left sidebar
+  - 640px: Full mobile optimization
+- New files:
+  - eventos/templates/eventos/index.html (complete redesign)
+  - eventos/static/eventos/css/eventos.css (modern professional styles)
+- Fixed URL routing (eventos/ now properly routes to main page)
 
 ### Environment Setup
 - Installed Python 3.11 module
@@ -49,9 +78,11 @@ The application is fully configured and running on Replit with:
 - All sidebar menu items accessible through bottom navigation on mobile
 
 ### Database
-- Migrated to PostgreSQL (DATABASE_URL with Replit's helium database)
+- **Current**: PostgreSQL (DATABASE_URL with Replit's built-in database)
 - All 58 migrations applied successfully
-- Created test tenant "Teste" with user pedro@teste.com for testing
+- Test tenant: "MySphere Corp" (ID: 1)
+- Test user: teste@mysphere.com (password: teste123)
+- Sample data: 5 eventos created for testing
 - Multi-tenant architecture with tenant isolation
 
 ## Project Architecture
@@ -84,8 +115,7 @@ MySphere/
 
 ### Development Commands
 - Always use `python3.11` explicitly for Django commands
-- Use `unset DATABASE_URL &&` prefix when running manage.py commands
-- This ensures compatibility with Replit environment
+- Database is now PostgreSQL (no need for unset DATABASE_URL)
 
 ### Mobile-First Design
 - Prioritize mobile experience with clean, minimalist UI
@@ -99,8 +129,13 @@ The Django development server is configured to run on `0.0.0.0:5000` to work wit
 
 Workflow command:
 ```bash
-unset DATABASE_URL && python3.11 manage.py runserver 0.0.0.0:5000
+python3.11 manage.py runserver 0.0.0.0:5000
 ```
+
+### Test Login Credentials
+- Email: teste@mysphere.com
+- Password: teste123
+- Tenant: MySphere Corp
 
 ### Creating a Superuser
 To create an admin account:
@@ -132,10 +167,10 @@ See `requirements.txt` for full list. Key dependencies:
 6. **Mobile Responsive**: Full mobile support with bottom navigation
 
 ## Known Issues & Notes
-- PostgreSQL had compatibility issues with Python version conflicts, using SQLite as fallback
-- Static files must be collected after CSS/JS changes
+- Static files must be collected after CSS/JS changes (run: `python3.11 manage.py collectstatic --noinput`)
 - Server must be running to see updates in the web preview
 - Mobile view activates at screen width < 1024px
+- Eventos page requires login - use test credentials above
 
 ## Next Steps
 - Consider migrating to PostgreSQL for production
