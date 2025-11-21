@@ -14,6 +14,11 @@ class UserManager(BaseUserManager):
         if tenant and isinstance(tenant, (int, str)):
             tenant = Tenant.objects.get(pk=tenant)
 
+        # Garantir que data_nascimento seja fornecida
+        if 'data_nascimento' not in extra_fields:
+            from datetime import date
+            extra_fields['data_nascimento'] = date(2000, 1, 1)
+
         user = self.model(email=email, tenant=tenant, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
