@@ -32,7 +32,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="tenant", null=True, blank=True)
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="tenant")
     email = models.EmailField(max_length=255, unique=True, null=False, blank=False)
     role = models.CharField(max_length=100, null=False, blank=False)
     foto = models.ImageField(upload_to="accounts/", null=True, blank=True)
