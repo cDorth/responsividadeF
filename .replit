@@ -5,6 +5,7 @@ integrations = ["python_database:1.0.0"]
 
 [nix]
 channel = "stable-25_05"
+packages = ["cacert", "cargo", "freetype", "lcms2", "libffi", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "openssl", "pgadmin4", "pkg-config", "rustc", "tcl", "tk", "zlib", "postgresql"]
 
 [userenv]
 
@@ -12,3 +13,35 @@ channel = "stable-25_05"
 SECRET_KEY = "XawPTvaLvAKIDf6Vt50EzPHpc1G0kiQv_WnYJnDDRbHxZQ_kXlYQkAWWWXu1W_N4UxM"
 FERNET_KEY = "HtrIRbtkR9e3q95GchCapydNChUit9gkT53fADctFbs="
 DEBUG = "True"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Django Server"
+
+[[workflows.workflow]]
+name = "Django Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "unset DATABASE_URL && python3.11 manage.py runserver 0.0.0.0:5000"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 43279
+externalPort = 3000

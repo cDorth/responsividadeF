@@ -444,6 +444,31 @@
       </div>
     </div>
 
+    <!-- Bottom Navigation for Mobile -->
+    <nav class="bottom-nav">
+      <div class="bottom-nav-container">
+        <a href="{% url 'feed:feed' %}" class="bottom-nav-item active">
+          <span class="icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="{% url 'feed:feed' %}" class="bottom-nav-item">
+          <span class="icon">📰</span>
+          <span>Feed</span>
+        </a>
+        <a href="{% url 'feed:create_post' %}" class="bottom-nav-item">
+          <span class="icon">➕</span>
+        </a>
+        <a href="{% url 'chat' %}" class="bottom-nav-item">
+          <span class="icon">📝</span>
+          <span>Chat</span>
+        </a>
+        <a href="{% url 'home' %}" class="bottom-nav-item">
+          <span class="icon">👤</span>
+          <span>Perfil</span>
+        </a>
+      </div>
+    </nav>
+
     <script src="{% static 'feed/js/feed.js' %}"></script>
   </body>
 </html>

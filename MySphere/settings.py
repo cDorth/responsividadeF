@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
-FERNET_KEY = env("FERNET_KEY")
+FERNET_KEY = os.getenv("FERNET_KEY")
 
 # Application definition
 
