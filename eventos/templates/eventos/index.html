@@ -16,9 +16,6 @@
                 <div class="logo">
                     <h1>{{user.tenant.nome}}</h1>
                 </div>
-                <form action="{% url 'feed:search' %}" method="GET" class="search-bar">
-                    <input type="text" name="q" placeholder="Search" autocomplete="off" />
-                </form>
             </div>
             <div class="header-right">
                 {% if user.is_staff %}
