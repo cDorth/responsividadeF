@@ -5,3 +5,10 @@ expertMode = true
 [nix]
 channel = "stable-25_05"
 packages = ["cacert", "cargo", "freetype", "lcms2", "libffi", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "openssl", "pgadmin4", "pkg-config", "redis", "rustc", "tcl", "tk", "zlib"]
+
+[userenv]
+
+[userenv.shared]
+SECRET_KEY = "bdgr!e1@+sef-j_q5wk@4#+8z!%z8iar6=dm8p6nki!^mimk3="
+FERNET_KEY = "0LPa2nk9Ulz2ywFaomXt1CMk03vqVkla7lx3VuEDe-U="
+DEBUG = "True"
