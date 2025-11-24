@@ -1,7 +1,7 @@
 {% extends 'staff/staff_home.html' %} 
 {% load static %} 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/staff_gamification.css' %}" />
+<link rel="stylesheet" href="{% static 'staff/css/staff_gamification.css' %}" />
 {% endblock %} 
 {% block content %}
 <div class="container-all">
@@ -14,7 +14,8 @@
         </div>
       <div class="btn-container"
           data-url-task="{% url 'task_create' %}"
-          data-url-user-task="{% url 'user_task_create' %}">
+          data-url-user-task="{% url 'user_task_create' %}"
+          data-url-conquistas="{% url 'conquista_create' %}">
           <a href="{% url 'task_create' %}" class="btn-form">
               <i class="fa-solid fa-plus"></i>
               Nova Tarefa
@@ -23,6 +24,7 @@
       </div> 
       <div class="tabs">
         <div class="tab active" data-tab="tarefas">Tarefas</div>
+        <div class="tab" data-tab="conquistas">Conquistas</div>
         <div class="tab" data-tab="tarefas_user">Atribuição</div>
         <div class="tab" data-tab="pontos">Pontos</div>
       </div>
@@ -51,7 +53,7 @@
               </tr>
               {% empty %}
               <tr>
-                <td colspan="4" class="empty">Nenhuma Task cadastrada.</td>
+                <td colspan="5" class="empty">Nenhuma Task cadastrada.</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -59,6 +61,44 @@
         </div>
       </section>
       <!-- FIM DAS TASKS -->
+      <!-- INICIO DAS CONQUISTAS -->
+      <section id="conquistas" class="tab-content"> 
+        <div class="table-wrap">
+          <table class="tasks-table" aria-label="Lista de tasks do sistema">
+            <thead>
+                <tr>
+                    <th>Conquista</th>
+                    <th>Foto</th>
+                    <th>Descrição</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for c in conquistas %}
+                <tr>
+                    <td>{{ c.nome }}</td>
+                    <td>
+                      {% if c.imagem %}
+                        <img src="{{ c.imagem.url }}" alt="{{ c.nome }}"
+                        style="display: block; margin: 0 auto; max-width: 60px; height: 50px; ">
+                      {% else %}
+                        <p>Não Possui imagem</p>
+                      {% endif %}
+                    </td>
+                    <td>{{ c.descricao }}</td>
+                    <td>{{ c.criado_em |date:"d/m/Y" }}</td>
+                </tr>    
+                {% empty %}
+                <tr>
+                    <td colspan="4">Você ainda não possui conquistas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+      </section>
+      <!-- FIM DAS CONQUISTAS -->
       <!-- ATRIBUIÇÃO DE USERS -->
       <section id="tarefas_user" class="tab-content">
         <div class="table-wrap">
@@ -77,14 +117,14 @@
               <tr>
                 <td>
                     <div class="perfil-user">
-                    {% if user.foto %}
-                    <img src="{{ user.foto.url }}" alt="{{ user.username }}" class="profile-avatar" />
+                    {% if ut.user.foto %}
+                    <img src="{{ ut.user.foto.url }}" alt="{{ ut.user.username }}" class="profile-avatar" />
                     {% else %}
                     <div class="profile-avatar default-avatar-large">
-                        {{ user.username|slice:":1"|upper }}
+                        {{ ut.user.username|slice:":1"|upper }}
                     </div>
                     {% endif %}
-                    <div>{{ user.username }}</div>
+                    <div>{{ ut.user.username }}</div>
                     </div>
                 </td>
                 <td>{{ ut.task.titulo }}</td>
@@ -106,7 +146,7 @@
                 </td>
               </tr>
               {% endfor %}
-            </tbody>
+              </tbody>
           </table>
         </div>
       </section>
@@ -151,5 +191,5 @@
     </div>
   </main>
 </div>
-<script src="{% static 'js/gamification.js' %}"></script>
+<script src="{% static 'staff/js/staff_gamification.js' %}"></script>
 {% endblock content %}

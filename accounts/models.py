@@ -14,11 +14,6 @@ class UserManager(BaseUserManager):
         if tenant and isinstance(tenant, (int, str)):
             tenant = Tenant.objects.get(pk=tenant)
 
-        # Garantir que data_nascimento seja fornecida
-        if 'data_nascimento' not in extra_fields:
-            from datetime import date
-            extra_fields['data_nascimento'] = date(2000, 1, 1)
-
         user = self.model(email=email, tenant=tenant, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -37,7 +32,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="tenant")
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="tenant", null=True, blank=True)
     email = models.EmailField(max_length=255, unique=True, null=False, blank=False)
     role = models.CharField(max_length=100, null=False, blank=False)
     foto = models.ImageField(upload_to="accounts/", null=True, blank=True)

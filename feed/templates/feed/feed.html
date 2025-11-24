@@ -30,7 +30,7 @@
         </div>
         <div class="header-right">
           {% if user.is_staff %}
-            <a href="{% url 'home_staff' %}" class="btn-staff">Staff</a>
+            <a href="{% url 'dashboard_staff' %}" class="btn-staff">Staff</a>
           {% endif %}
           <div class="user-info">
             {% if user.foto %}
@@ -175,7 +175,7 @@
                     />
                   </label>
                   <label for="arquivo-upload" class="post-option">
-                    <span class="icon">📎</span> Attachment
+                    <span class="icon">📎</span> Arquivos
                     <input
                       type="file"
                       id="arquivo-upload"
@@ -187,10 +187,10 @@
                     ><span class="icon">#</span> Hashtag</span
                   >
                   <span class="post-option"
-                    ><span class="icon">@</span> Mention</span
+                    ><span class="icon">@</span> Menção</span
                   >
                 </div>
-                <button type="submit" class="btn-post">Share Post</button>
+                <button type="submit" class="btn-post">Enviar Post</button>
               </div>
             </form>
           </div>
@@ -477,7 +477,7 @@
           </svg>
           <span>Gamif.</span>
         </a>
-        <a href="{% url 'listar_eventos_compacto' %}" class="bottom-nav-item" aria-label="Eventos">
+        <a href="{% url 'listar_eventos' %}" class="bottom-nav-item" aria-label="Eventos">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
           </svg>
