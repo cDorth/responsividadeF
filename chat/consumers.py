@@ -22,7 +22,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         chat = await self.get_chat(self.chat_id)
 
         if sender and not isinstance(sender, AnonymousUser):
-            await self.save_message(chat, sender, message)
+            msg = Message(chat=chat, remetente=sender)
+            msg.conteudo = message
+            msg.save()
 
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -41,12 +43,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @staticmethod
     @database_sync_to_async
-    def get_chat(chat_id):
+    async def get_chat(chat_id):
         return Chat.objects.get(id=chat_id)
-    
-    @staticmethod
-    @database_sync_to_async
-    def save_message(chat, sender, message_content):
-        msg = Message(chat=chat, remetente=sender, conteudo=message_content)
-        msg.save()
-        return msg

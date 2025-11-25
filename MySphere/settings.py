@@ -137,12 +137,13 @@ CHANNEL_LAYERS = {
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 if DATABASE_URL:
-    # PostgreSQL via DATABASE_URL
+    # Ambiente local (PostgreSQL local)
     DATABASES = {
         "default": env.db()
     }
-elif os.getenv("DB_NAME"):
-    # PostgreSQL via individual env vars
+
+else:
+    # Ambiente VPS (PostgreSQL local do servidor)
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -151,14 +152,6 @@ elif os.getenv("DB_NAME"):
             "PASSWORD": os.getenv("DB_PASSWORD"),
             "HOST": os.getenv("DB_HOST", "localhost"),
             "PORT": os.getenv("DB_PORT", 5432),
-        }
-    }
-else:
-    # SQLite fallback for development
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 
