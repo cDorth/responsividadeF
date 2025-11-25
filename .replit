@@ -4,3 +4,10 @@ expertMode = true
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+SECRET_KEY = "&j^3@d!&69_+_&e+r_7x@#yua0s+ljd!b_c=*amht2r-6_xow$"
+FERNET_KEY = "1KX3Ox4RNwXCAk-5PVxos87VBjwP9ukZWujgOlvG2NU="
+DEBUG = "True"

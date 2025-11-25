@@ -95,6 +95,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'tenants.middleware.TenantMiddleware',
+    'MySphere.middleware.CacheControlMiddleware',
 ]
 
 ROOT_URLCONF = 'MySphere.urls'
@@ -120,10 +121,7 @@ ASGI_APPLICATION = 'MySphere.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],
-        },
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
 
@@ -137,13 +135,12 @@ CHANNEL_LAYERS = {
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 if DATABASE_URL:
-    # Ambiente local (PostgreSQL local)
+    # PostgreSQL via DATABASE_URL
     DATABASES = {
         "default": env.db()
     }
-
-else:
-    # Ambiente VPS (PostgreSQL local do servidor)
+elif os.getenv("DB_NAME"):
+    # PostgreSQL with individual credentials
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -152,6 +149,14 @@ else:
             "PASSWORD": os.getenv("DB_PASSWORD"),
             "HOST": os.getenv("DB_HOST", "localhost"),
             "PORT": os.getenv("DB_PORT", 5432),
+        }
+    }
+else:
+    # Fallback to SQLite for development
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 
