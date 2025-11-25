@@ -5,7 +5,7 @@ def tenant_context(request):
 
     if not user.is_authenticated or user.is_superuser:
         return {"tenant": None}
-    if hasattr(user, "tenant"):
+    if hasattr(user, "tenant") and user.tenant is not None:
         try:
             return {
                 "tenant": Tenant.objects.get(pk=user.tenant.pk)
