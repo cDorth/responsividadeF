@@ -600,6 +600,46 @@
 
 /* Tablet Responsive */
 @media (max-width: 1024px) {
+    body {
+        overflow-x: hidden;
+    }
+
+    .container {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+
+    .main-content {
+        grid-template-columns: 1fr;
+        padding: 0 12px;
+        margin: 12px auto;
+        margin-bottom: 80px;
+        gap: 12px;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .sidebar-left,
+    .sidebar-right {
+        display: none !important;
+    }
+
+    .feed-center {
+        max-width: 100%;
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    .profile-info-card,
+    .post-card,
+    .auth-form-card,
+    .logout-form-card,
+    .no-posts-card {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
     .profile-cover {
         height: 120px;
         padding-bottom: 30px;
@@ -630,6 +670,7 @@
 
     .auth-form-card {
         padding: 24px;
+        margin: 0 auto;
     }
 
     .auth-form-header h2 {
@@ -641,18 +682,33 @@
         height: 70px;
         font-size: 35px;
     }
-
-    .sidebar-right {
-        display: none !important;
-    }
-
-    .main-content {
-        grid-template-columns: 280px 1fr;
-    }
 }
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+    .main-content {
+        padding: 0 8px;
+        margin: 8px auto;
+        gap: 10px;
+        margin-bottom: 85px;
+        max-width: 100%;
+    }
+
+    .feed-center {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .profile-info-card,
+    .post-card,
+    .auth-form-card,
+    .logout-form-card,
+    .no-posts-card {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
     .profile-cover {
         height: 100px;
         padding-bottom: 25px;
@@ -697,6 +753,9 @@
     .auth-form-card {
         padding: 20px;
         border-radius: 12px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .auth-form-header {
@@ -744,6 +803,42 @@
 
 /* Small Mobile */
 @media (max-width: 640px) {
+    body {
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    .container {
+        overflow-x: hidden;
+        max-width: 100vw;
+        width: 100%;
+    }
+
+    .main-content {
+        padding: 0 8px;
+        width: 100%;
+        max-width: 100vw;
+        box-sizing: border-box;
+    }
+
+    .feed-center {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .profile-info-card,
+    .post-card,
+    .auth-form-card,
+    .logout-form-card,
+    .no-posts-card {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        box-sizing: border-box;
+    }
+
     .profile-meta {
         flex-direction: column;
         gap: 12px;
@@ -769,5 +864,13 @@
     .btn-edit {
         width: 100%;
         justify-content: center;
+    }
+
+    .auth-form-card {
+        width: 100%;
+        max-width: 100%;
+        padding: 16px;
+        margin: 0;
+        box-sizing: border-box;
     }
 }
