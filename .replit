@@ -11,3 +11,39 @@ channel = "stable-25_05"
 SECRET_KEY = "&j^3@d!&69_+_&e+r_7x@#yua0s+ljd!b_c=*amht2r-6_xow$"
 FERNET_KEY = "1KX3Ox4RNwXCAk-5PVxos87VBjwP9ukZWujgOlvG2NU="
 DEBUG = "True"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Django Server"
+
+[[workflows.workflow]]
+name = "Django Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python manage.py runserver 0.0.0.0:5000"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 32801
+externalPort = 3000
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["gunicorn", "--bind=0.0.0.0:5000", "--reuse-port", "MySphere.wsgi:application"]
