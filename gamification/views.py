@@ -17,10 +17,16 @@ class StaffGamificationView(OnlyIsStaff, TenantAccessMixin, ListView):
     model = Points
     context_object_name = 'points'
 
+    def get_queryset(self):
+        tenant = self.request.user.tenant
+        return Points.objects.filter(tenant=tenant)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         tenant = self.request.user.tenant
+
+        context['points'] = Points.objects.filter(tenant=tenant)
         context['tasks'] = Task.objects.filter(tenant=tenant)
         context['user_tasks'] = User_Task.objects.filter(task__tenant=tenant)
         context['conquistas'] = Conquista.objects.filter(tenant=tenant)
@@ -28,9 +34,10 @@ class StaffGamificationView(OnlyIsStaff, TenantAccessMixin, ListView):
         return context
 
 
+
 # VIEW QUE RENDERIZA PONTOS E TASKS DO USER
 
-class GameHomeView(OnlyIsStaff, TenantAccessMixin, ListView):
+class GameHomeView(TenantAccessMixin, ListView):
     model = Points
     template_name = 'gamification/gamification_points_user.html'
     context_object_name = 'points'
@@ -54,7 +61,7 @@ class GameHomeView(OnlyIsStaff, TenantAccessMixin, ListView):
                     order_by=F('points_total').desc()
 
                 )
-            ).order_by('-points_total')
+            ).order_by('-points_atual')
 
             top5 = ranking[:5]
             user_line = ranking.filter(user=user).first()
@@ -81,34 +88,14 @@ class GameHomeView(OnlyIsStaff, TenantAccessMixin, ListView):
 
 @require_POST
 @login_required
-def concluir_tarefa(request, task_id):
-    user_task = get_object_or_404(User_Task, id=task_id, user=request.user)
+def concluir_tarefa(request, usertask_id):
+    user_task = get_object_or_404(User_Task, id=usertask_id, user=request.user)
 
     if user_task.concluido:
         return redirect('game_home')
 
     user_task.concluido = True
     user_task.save()
-
-    pontos_user, created = Points.objects.get_or_create(
-        user=request.user,
-        defaults={
-            'tenant': request.user.tenant,
-            'points_atual': 0,
-            'points_total': 0,
-            'nivel': 'Iniciante'
-        }
-    )
-
-    if user_task.task.pontos > 0:
-        pontos_user.add_points(user_task.task.pontos)
-
-    if user_task.task.conquista:
-        User_Conquista.objects.get_or_create(
-            user=request.user,
-            conquista=user_task.task.conquista
-        )
-
     return redirect('game_home')
 
 # VIEWS - CREATE
@@ -120,14 +107,23 @@ class TaskCreateView(OnlyIsStaff, TenantAccessMixin, CreateView):
     success_url = reverse_lazy('game_staff')
     
 class UserTaskCreateView(OnlyIsStaff, TenantAccessMixin, CreateView):
-    model = User_Task
     form_class = UserTaskForm
     template_name = "gamification/gamification_users_tasks_form.html"
     success_url = reverse_lazy('game_staff')
 
     def form_valid(self, form):
-        form.instance.atribuido_por = self.request.user 
-        return super().form_valid(form)
+        task = form.cleaned_data['task']
+        users = form.cleaned_data['users']
+        atribuido_por = self.request.user
+
+        for user in users:
+            User_Task.objects.get_or_create(
+                user=user,
+                task=task,
+                defaults={'atribuido_por': atribuido_por}
+            )
+
+        return redirect(self.success_url)
 
 # VIEWS - UPDATE 
 

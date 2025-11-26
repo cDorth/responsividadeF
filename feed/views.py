@@ -13,14 +13,6 @@ from django.utils import timezone
 
 @login_required
 def feed_view(request):
-    # Verifica se o usuário tem um tenant
-    if not request.user.tenant:
-        # Redireciona superusuários para a lista de tenants
-        if request.user.is_superuser:
-            return redirect('tenant_list')
-        # Outros usuários sem tenant não podem acessar o feed
-        return redirect('login')
-    
     posts = Post.objects.filter(
         tenant=request.user.tenant
     ).select_related('user').prefetch_related('likes', 'comments', 'shares', 'hashtags')
@@ -36,15 +28,18 @@ def feed_view(request):
     ).order_by('-ultima_msg')[:5]
 
     # 🔹 Aqui busca os eventos do mesmo tenant do usuário
+    eventos = Evento.objects.filter(
+        tenant=request.user.tenant
+    ).order_by('inicio')
+
+    # 🔹 Se quiser, restringe aos próximos eventos:
     hoje = timezone.now()
     eventos = (
-        Evento.objects.filter(
-            tenant=request.user.tenant,
-            fim__gte=hoje
-        )
-        .order_by('fim')
-    )[:3]
+        Evento.objects.filter(fim__gte=hoje)  # só os que ainda vão acontecer
+        .order_by('fim')                      # ordena do mais próximo pro mais distante
+    )[:3]  # limita aos 5 primeiros
     
+
     pode_gerenciar = request.user.is_staff or request.user.groups.filter(name='Organizadores').exists()
 
     context = {

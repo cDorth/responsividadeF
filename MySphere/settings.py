@@ -27,12 +27,6 @@ DEBUG = True
 # DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-# CSRF Configuration for Replit
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.replit.dev',
-    'https://*.repl.co',
-]
-
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 FERNET_KEY = env("FERNET_KEY")
@@ -86,7 +80,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 SOCIALACCOUNT_AUTO_SIGNUP = True 
@@ -101,7 +95,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'tenants.middleware.TenantMiddleware',
-    'MySphere.middleware.CacheControlMiddleware',
 ]
 
 ROOT_URLCONF = 'MySphere.urls'
@@ -127,7 +120,10 @@ ASGI_APPLICATION = 'MySphere.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
     },
 }
 
@@ -141,12 +137,13 @@ CHANNEL_LAYERS = {
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 if DATABASE_URL:
-    # PostgreSQL via DATABASE_URL
+    # Ambiente local (PostgreSQL local)
     DATABASES = {
         "default": env.db()
     }
-elif os.getenv("DB_NAME"):
-    # PostgreSQL with individual credentials
+
+else:
+    # Ambiente VPS (PostgreSQL local do servidor)
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -155,14 +152,6 @@ elif os.getenv("DB_NAME"):
             "PASSWORD": os.getenv("DB_PASSWORD"),
             "HOST": os.getenv("DB_HOST", "localhost"),
             "PORT": os.getenv("DB_PORT", 5432),
-        }
-    }
-else:
-    # Fallback to SQLite for development
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 
