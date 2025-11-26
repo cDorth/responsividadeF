@@ -27,6 +27,16 @@ DEBUG = True
 # DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 SECRET_KEY = os.getenv('SECRET_KEY')
 
+# CSRF and Security settings for Replit
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.replit.dev',
+    'https://*.repl.co',
+    'https://*.picard.replit.dev',
+]
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+X_FRAME_OPTIONS = 'ALLOWALL'
+
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 FERNET_KEY = env("FERNET_KEY")
