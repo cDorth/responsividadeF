@@ -17,14 +17,9 @@
             </div>
         </div>
 
-        <div class="header-center">
-            <span class="game-icon">🎮</span>
-            <h1>Gamificação</h1>
-        </div>
-
         <div class="header-right">
             {% if user.is_staff %}
-            <a href="{% url 'game_staff' %}" class="btn-staff">Gerenciar</a>
+            <a href="{% url 'game_staff' %}" class="btn-staff">Staff</a>
             {% endif %}
             <div class="user-info">
                 {% if user.foto %}
@@ -61,7 +56,6 @@
                     </div>
 
                     <div class="level-badge">
-                        <span class="icon">⭐</span>
                         Nível {{ point.nivel }}
                     </div>
 
@@ -85,6 +79,9 @@
                         <div class="points-current">0</div>
                         <div class="points-label">Pontos Atuais</div>
                     </div>
+                    <div class="level-badge">
+                        Nível Iniciante
+                    </div>
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-value">0</div>
@@ -105,19 +102,19 @@
             <div class="quick-actions">
                 <h4>Navegação Rápida</h4>
                 <div class="action-item active" data-tab-link="tarefas">
-                    <div class="action-icon tasks">📋</div>
+                    <div class="action-icon">📋</div>
                     <span>Minhas Tarefas</span>
                 </div>
                 <div class="action-item" data-tab-link="ranking">
-                    <div class="action-icon ranking">🏆</div>
+                    <div class="action-icon">🏆</div>
                     <span>Ranking Mensal</span>
                 </div>
                 <div class="action-item" data-tab-link="conquistas">
-                    <div class="action-icon achievements">🎖️</div>
+                    <div class="action-icon">🎖️</div>
                     <span>Conquistas</span>
                 </div>
                 <div class="action-item" data-tab-link="ranking_geral">
-                    <div class="action-icon global">🌍</div>
+                    <div class="action-icon">🌍</div>
                     <span>Ranking Geral</span>
                 </div>
             </div>
@@ -189,7 +186,7 @@
             <section id="tarefas" class="tab-content active">
                 <div class="section-header">
                     <div class="section-title">
-                        <h2><span class="icon">📋</span> Minhas Tarefas</h2>
+                        <h2>Minhas Tarefas</h2>
                         <p>Complete tarefas para ganhar pontos e subir no ranking</p>
                     </div>
                     <div class="section-stats">
@@ -206,11 +203,9 @@
                         <article class="task-card {% if user_task.concluido %}completed{% else %}pending{% endif %}">
                             <div class="task-header">
                                 <div class="task-title">
-                                    <span class="task-icon">{% if user_task.concluido %}✅{% else %}📌{% endif %}</span>
                                     {{ user_task.task.titulo }}
                                 </div>
                                 <div class="task-points">
-                                    <span>⭐</span>
                                     {{ user_task.task.pontos }} pts
                                 </div>
                             </div>
@@ -221,13 +216,11 @@
                             
                             <div class="task-footer">
                                 <div class="task-status {% if user_task.concluido %}done{% else %}pending{% endif %}">
-                                    <span class="status-icon">{% if user_task.concluido %}✓{% else %}⏳{% endif %}</span>
                                     {% if user_task.concluido %}Concluída{% else %}Pendente{% endif %}
                                 </div>
 
                                 {% if user_task.task.conquista %}
                                 <div class="task-reward">
-                                    <span>🎖️</span>
                                     Recompensa: {{ user_task.task.conquista.nome }}
                                 </div>
                                 {% endif %}
@@ -236,7 +229,6 @@
                                 <form method="POST" action="{% url 'concluir_tarefa' user_task.id %}">
                                     {% csrf_token %}
                                     <button type="submit" class="btn-complete">
-                                        <span>✓</span>
                                         Concluir Tarefa
                                     </button>
                                 </form>
@@ -257,7 +249,7 @@
             <section id="ranking" class="tab-content">
                 <div class="section-header">
                     <div class="section-title">
-                        <h2><span class="icon">🏆</span> Ranking Mensal</h2>
+                        <h2>Ranking Mensal</h2>
                         <p>Veja quem está liderando este mês</p>
                     </div>
                 </div>
@@ -274,7 +266,7 @@
                         </thead>
                         <tbody>
                             {% for r in ranking %}
-                            <tr class="{% if r.user == request.user %}current-user{% endif %} {% if r.posicao <= 3 %}top-3{% endif %}">
+                            <tr class="{% if r.user == request.user %}current-user{% endif %}">
                                 <td>
                                     <span class="position-badge {% if r.posicao == 1 %}gold{% elif r.posicao == 2 %}silver{% elif r.posicao == 3 %}bronze{% else %}normal{% endif %}">
                                         {{ r.posicao }}
@@ -293,7 +285,7 @@
                                 <td class="points-cell">{{ r.points_atual }} pts</td>
                                 <td>
                                     <span class="level-cell">
-                                        ⭐ Nível {{ r.nivel }}
+                                        Nível {{ r.nivel }}
                                     </span>
                                 </td>
                             </tr>
@@ -313,7 +305,6 @@
 
                     {% if user_line and user_line.posicao > 5 %}
                     <div class="user-position-summary">
-                        <span class="position-icon">📍</span>
                         <p>
                             <strong>Sua posição:</strong> {{ user_line.posicao }}º lugar com {{ user_line.points_atual }} pontos este mês.
                         </p>
@@ -325,7 +316,7 @@
             <section id="conquistas" class="tab-content">
                 <div class="section-header">
                     <div class="section-title">
-                        <h2><span class="icon">🎖️</span> Suas Conquistas</h2>
+                        <h2>Suas Conquistas</h2>
                         <p>Medalhas e recompensas que você desbloqueou</p>
                     </div>
                     <div class="section-stats">
@@ -349,7 +340,6 @@
                         <h3>{{ c.conquista.nome }}</h3>
                         <p>{{ c.conquista.descricao }}</p>
                         <div class="achievement-date">
-                            <span class="date-icon">📅</span>
                             Obtida em {{ c.recebido_em | date:"d/m/Y" }}
                         </div>
                     </div>
@@ -366,7 +356,7 @@
             <section id="ranking_geral" class="tab-content">
                 <div class="section-header">
                     <div class="section-title">
-                        <h2><span class="icon">🌍</span> Ranking Geral</h2>
+                        <h2>Ranking Geral</h2>
                         <p>Classificação de todos os tempos</p>
                     </div>
                 </div>
@@ -383,7 +373,7 @@
                         </thead>
                         <tbody>
                             {% for r in ranking_geral %}
-                            <tr class="{% if r.user == request.user %}current-user{% endif %} {% if r.posicao <= 3 %}top-3{% endif %}">
+                            <tr class="{% if r.user == request.user %}current-user{% endif %}">
                                 <td>
                                     <span class="position-badge {% if r.posicao == 1 %}gold{% elif r.posicao == 2 %}silver{% elif r.posicao == 3 %}bronze{% else %}normal{% endif %}">
                                         {{ r.posicao }}
@@ -402,7 +392,7 @@
                                 <td class="points-cell">{{ r.points_total }} pts</td>
                                 <td>
                                     <span class="level-cell">
-                                        ⭐ Nível {{ r.nivel }}
+                                        Nível {{ r.nivel }}
                                     </span>
                                 </td>
                             </tr>
@@ -422,7 +412,6 @@
 
                     {% if user_line_geral and user_line_geral.posicao > 5 %}
                     <div class="user-position-summary">
-                        <span class="position-icon">📍</span>
                         <p>
                             <strong>Sua posição geral:</strong> {{ user_line_geral.posicao }}º lugar com {{ user_line_geral.points_total }} pontos no total.
                         </p>
@@ -434,7 +423,7 @@
 
         <aside class="sidebar-right">
             <div class="leaderboard-preview">
-                <h3><span class="icon">🏆</span> Top 5 do Mês</h3>
+                <h3>Top 5 do Mês</h3>
                 {% for r in ranking|slice:":5" %}
                 <div class="leaderboard-item {% if forloop.first %}top-1{% endif %}">
                     <span class="leaderboard-position {% if forloop.first %}gold{% endif %}">{{ r.posicao }}º</span>
@@ -454,7 +443,7 @@
             </div>
 
             <div class="progress-card">
-                <h3><span class="icon">📊</span> Seu Progresso</h3>
+                <h3>Seu Progresso</h3>
                 {% if points %}
                     {% for point in points %}
                     <div class="progress-item">
@@ -470,7 +459,7 @@
                 {% else %}
                     <div class="progress-item">
                         <div class="progress-label">
-                            <span>Nível 1</span>
+                            <span>Nível Iniciante</span>
                             <strong>0/100 pts</strong>
                         </div>
                         <div class="progress-bar">
@@ -481,7 +470,7 @@
             </div>
 
             <div class="tips-card">
-                <h3>💡 Dica</h3>
+                <h3>Dica</h3>
                 <p>Complete suas tarefas diárias para subir no ranking e desbloquear conquistas exclusivas!</p>
             </div>
         </aside>
