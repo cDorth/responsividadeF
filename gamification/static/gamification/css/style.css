@@ -607,7 +607,8 @@ a {
 }
 
 .ranking-table tbody tr.current-user {
-    background: #e7f3ff;
+    background: #dbeafe;
+    border-left: 3px solid #2563eb;
 }
 
 .position-badge {
@@ -622,23 +623,27 @@ a {
 }
 
 .position-badge.gold {
-    background: #2563eb;
-    color: #fff;
+    background: #FFD700;
+    color: #1c1e21;
+    font-weight: 800;
 }
 
 .position-badge.silver {
-    background: #64748b;
-    color: #fff;
+    background: #C0C0C0;
+    color: #1c1e21;
+    font-weight: 800;
 }
 
 .position-badge.bronze {
-    background: #94a3b8;
+    background: #CD7F32;
     color: #fff;
+    font-weight: 800;
 }
 
 .position-badge.normal {
-    background: #f0f2f5;
-    color: #65676b;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 700;
 }
 
 .user-cell {
