@@ -937,17 +937,23 @@
   stroke-linejoin: round;
 }
 
-.bottom-nav-item:hover {
-  color: #2563eb;
-  background: rgba(37, 99, 235, 0.08);
-}
-
 .bottom-nav-item.active {
-  color: #2563eb;
+  color: #1877f2;
+  background: rgba(24, 119, 242, 0.08);
 }
 
 .bottom-nav-item.active svg {
-  stroke: #2563eb;
+  stroke: #1877f2;
+  transform: scale(1.1);
+}
+
+.bottom-nav-item:hover:not(.active) {
+  color: #1877f2;
+  background: rgba(24, 119, 242, 0.05);
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.95);
 }
 
 .bottom-nav-item span {
